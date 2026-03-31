@@ -78,12 +78,10 @@ export function CSVExport({ data }: CSVExportProps) {
       id="csv-export-btn"
       onClick={handleExport}
       disabled={!data}
-      className="flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium 
-                 shadow-sm transition-all duration-200
-                 border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:shadow-md
+      className="card flex items-center gap-2 px-4 py-2 text-sm font-semibold
+                 text-slate-600 hover:text-slate-900
                  disabled:cursor-not-allowed disabled:opacity-40
-                 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 
-                 dark:hover:bg-white/10"
+                 dark:text-slate-400 dark:hover:text-white"
     >
       <FileDown className="h-4 w-4" />
       Export CSV

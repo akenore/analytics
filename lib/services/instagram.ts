@@ -13,7 +13,8 @@ export async function fetchInstagramInsights(
   }
 
   try {
-    const since = Math.floor(subDays(new Date(), days).getTime() / 1000);
+    const cappedDays = Math.min(days, 30);
+    const since = Math.floor(subDays(new Date(), cappedDays).getTime() / 1000);
     const until = Math.floor(Date.now() / 1000);
 
     const reachRes = await fetch(

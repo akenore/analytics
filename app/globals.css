@@ -1,20 +1,27 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ───────────────────────────────────────────────────────── */
 :root {
-  --background: #f1f5f9;
+  --background: #f8fafc;
   --foreground: #0f172a;
   --card-bg: #ffffff;
-  --card-border: rgba(51, 65, 85, 0.15);
-  --muted: #475569;
+  --card-border: rgba(15, 23, 42, 0.08);
+  --card-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.06);
+  --card-shadow-hover: 0 4px 16px rgba(15, 23, 42, 0.08), 0 8px 32px rgba(15, 23, 42, 0.1);
+  --muted: #64748b;
+  --surface: #f1f5f9;
+  --accent: #3b82f6;
 }
 
 .dark {
   --background: #030712;
   --foreground: #f1f5f9;
   --card-bg: rgba(255, 255, 255, 0.03);
-  --card-border: rgba(255, 255, 255, 0.1);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.4);
   --muted: #94a3b8;
+  --surface: rgba(255, 255, 255, 0.04);
+  --accent: #60a5fa;
 }
 
 @theme inline {
@@ -24,7 +31,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* ─── Base ────────────────────────────────────────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -33,109 +39,98 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Light Mode Background ──────────────────────────────────────────────── */
 :root body {
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.06), transparent),
-    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(139, 92, 246, 0.04), transparent);
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(99, 102, 241, 0.07), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 50%, rgba(59, 130, 246, 0.05), transparent),
+    radial-gradient(ellipse 50% 30% at 20% 80%, rgba(236, 72, 153, 0.04), transparent);
 }
 
-/* ─── Dark Mode Background Mesh ──────────────────────────────────────────── */
 .dark body {
   background-image:
     radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59, 130, 246, 0.08), transparent),
     radial-gradient(ellipse 60% 40% at 80% 50%, rgba(139, 92, 246, 0.05), transparent);
 }
 
-/* ─── Scrollbar ───────────────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+  border-color: rgba(59, 130, 246, 0.15);
 }
 
-::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.3);
-  border-radius: 3px;
+.dark .card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.15);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.25); border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.15); }
 
-/* ─── Recharts Overrides ──────────────────────────────────────────────────── */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: rgba(51, 65, 85, 0.12) !important;
+  stroke: rgba(15, 23, 42, 0.06) !important;
+  stroke-dasharray: 4 4;
 }
-
 .dark .recharts-cartesian-grid-horizontal line,
 .dark .recharts-cartesian-grid-vertical line {
   stroke: rgba(255, 255, 255, 0.06) !important;
 }
 
-.recharts-text {
-  fill: #475569 !important;
-  font-size: 12px;
-}
+.recharts-text { fill: #64748b !important; font-size: 11px; font-weight: 500; }
+.dark .recharts-text { fill: #64748b !important; }
 
-.dark .recharts-text {
-  fill: #64748b !important;
-}
-
-/* Tooltip in light mode */
 .recharts-tooltip-wrapper {
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.12));
 }
 
-/* Legend text */
-.recharts-legend-item-text {
-  color: #334155 !important;
-}
+.recharts-legend-item-text { color: #475569 !important; font-size: 12px !important; font-weight: 500 !important; }
+.dark .recharts-legend-item-text { color: #94a3b8 !important; }
 
-.dark .recharts-legend-item-text {
-  color: #94a3b8 !important;
-}
-
-/* ─── Loading skeleton ────────────────────────────────────────────────────── */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
 .skeleton {
-  background: linear-gradient(90deg, 
-    rgba(100, 116, 139, 0.08) 25%, 
-    rgba(100, 116, 139, 0.15) 50%, 
-    rgba(100, 116, 139, 0.08) 75%);
+  background: linear-gradient(90deg,
+    rgba(100, 116, 139, 0.06) 25%,
+    rgba(100, 116, 139, 0.12) 50%,
+    rgba(100, 116, 139, 0.06) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
 }
 
 .dark .skeleton {
-  background: linear-gradient(90deg, 
-    rgba(148, 163, 184, 0.08) 25%, 
-    rgba(148, 163, 184, 0.15) 50%, 
-    rgba(148, 163, 184, 0.08) 75%);
+  background: linear-gradient(90deg,
+    rgba(148, 163, 184, 0.06) 25%,
+    rgba(148, 163, 184, 0.12) 50%,
+    rgba(148, 163, 184, 0.06) 75%);
   background-size: 200% 100%;
 }
 
-/* ─── Fade-in animation ──────────────────────────────────────────────────── */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count {
+  animation: countUp 0.4s ease-out forwards;
 }

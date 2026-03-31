@@ -13,7 +13,8 @@ export async function fetchMetaInsights(
   }
 
   try {
-    const since = Math.floor(subDays(new Date(), days).getTime() / 1000);
+    const cappedDays = Math.min(days, 90);
+    const since = Math.floor(subDays(new Date(), cappedDays).getTime() / 1000);
     const until = Math.floor(Date.now() / 1000);
     const metrics = "page_views_total,page_follows,page_daily_follows";
 

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateBaseDashboard } from "@/lib/mock-data";
-import type { DateRangeKey } from "@/lib/types";
+import { generateEmptyDashboard } from "@/lib/mock-data";
+import type { DateRangeKey, SocialDaily, DownloadsDaily, AppStatsDaily } from "@/lib/types";
 
 import { fetchAppStoreDownloads } from "@/lib/services/appstore-connect";
 import { fetchGooglePlayDownloads } from "@/lib/services/google-play";
@@ -14,7 +14,7 @@ const RANGE_DAYS: Record<DateRangeKey, number> = {
   "7d": 7,
   "30d": 30,
   "90d": 90,
-  all: 365,
+  all: 90,
 };
 
 export async function GET(request: NextRequest) {
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const range = (searchParams.get("range") || "30d") as DateRangeKey;
     const days = RANGE_DAYS[range] || 30;
 
-    const data = generateBaseDashboard(days);
+    const data = generateEmptyDashboard(days);
 
     const [appStoreData, playData, metaData, instaData, tiktokData] = await Promise.all([
       fetchAppStoreDownloads(days),
@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
     ]);
 
     if (metaData) {
-      metaData.forEach((realDay) => {
-        const day = data.social.find((s) => s.date === realDay.date);
+      metaData.forEach((realDay: Partial<SocialDaily>) => {
+        const day = data.social.find((s: SocialDaily) => s.date === realDay.date);
         if (day) {
           if (realDay.facebookImpressions !== undefined) day.facebookImpressions = realDay.facebookImpressions;
           if (realDay.facebookReach !== undefined) day.facebookReach = realDay.facebookReach;
@@ -45,8 +45,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (instaData) {
-      instaData.forEach((realDay) => {
-        const day = data.social.find((s) => s.date === realDay.date);
+      instaData.forEach((realDay: Partial<SocialDaily>) => {
+        const day = data.social.find((s: SocialDaily) => s.date === realDay.date);
         if (day) {
           if (realDay.instagramImpressions !== undefined) day.instagramImpressions = realDay.instagramImpressions;
           if (realDay.instagramReach !== undefined) day.instagramReach = realDay.instagramReach;
@@ -56,8 +56,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (tiktokData) {
-      tiktokData.forEach((realDay) => {
-        const day = data.social.find((s) => s.date === realDay.date);
+      tiktokData.forEach((realDay: Partial<SocialDaily>) => {
+        const day = data.social.find((s: SocialDaily) => s.date === realDay.date);
         if (day) {
           if (realDay.tiktokViews !== undefined) day.tiktokViews = realDay.tiktokViews;
           if (realDay.tiktokLikes !== undefined) day.tiktokLikes = realDay.tiktokLikes;
@@ -67,49 +67,48 @@ export async function GET(request: NextRequest) {
     }
 
     if (appStoreData) {
-      appStoreData.forEach((realDay) => {
-        const day = data.downloads.find((d) => d.date === realDay.date);
+      appStoreData.forEach((realDay: { date: string; iosDownloads: number }) => {
+        const day = data.downloads.find((d: DownloadsDaily) => d.date === realDay.date);
         if (day && realDay.iosDownloads !== undefined) day.iosDownloads = realDay.iosDownloads;
       });
     }
 
     if (playData) {
-      playData.forEach((realDay) => {
-        const day = data.downloads.find((d) => d.date === realDay.date);
+      playData.forEach((realDay: { date: string; androidDownloads: number }) => {
+        const day = data.downloads.find((d: DownloadsDaily) => d.date === realDay.date);
         if (day && realDay.androidDownloads !== undefined) day.androidDownloads = realDay.androidDownloads;
       });
     }
 
-    // Recalculate all KPIs and summaries from actual merged data
-    const androidDl = data.downloads.map((d) => d.androidDownloads);
-    const iosDl = data.downloads.map((d) => d.iosDownloads);
-    const appOpens = data.appStats.map((d) => d.androidOpens + d.iosOpens);
-    const socialReach = data.social.map((d) => d.facebookReach + d.instagramReach + d.tiktokViews);
+    const androidDl = data.downloads.map((d: DownloadsDaily) => d.androidDownloads);
+    const iosDl = data.downloads.map((d: DownloadsDaily) => d.iosDownloads);
+    const appOpens = data.appStats.map((d: AppStatsDaily) => d.androidOpens + d.iosOpens);
+    const socialReach = data.social.map((d: SocialDaily) => d.facebookReach + d.instagramReach + d.tiktokViews);
 
     data.kpis.totalAndroidDownloads = {
       label: "Android Downloads",
-      value: androidDl.reduce((a, b) => a + b, 0),
+      value: androidDl.reduce((a: number, b: number) => a + b, 0),
       previousValue: 0,
       growthPercent: 0,
       sparklineData: androidDl.slice(-14),
     };
     data.kpis.totalIosDownloads = {
       label: "iOS Downloads",
-      value: iosDl.reduce((a, b) => a + b, 0),
+      value: iosDl.reduce((a: number, b: number) => a + b, 0),
       previousValue: 0,
       growthPercent: 0,
       sparklineData: iosDl.slice(-14),
     };
     data.kpis.totalAppOpens = {
       label: "App Opens",
-      value: appOpens.reduce((a, b) => a + b, 0),
+      value: appOpens.reduce((a: number, b: number) => a + b, 0),
       previousValue: 0,
       growthPercent: 0,
       sparklineData: appOpens.slice(-14),
     };
     data.kpis.totalSocialReach = {
       label: "Social Reach",
-      value: socialReach.reduce((a, b) => a + b, 0),
+      value: socialReach.reduce((a: number, b: number) => a + b, 0),
       previousValue: 0,
       growthPercent: 0,
       sparklineData: socialReach.slice(-14),
@@ -118,7 +117,7 @@ export async function GET(request: NextRequest) {
     data.summary = {
       totalDownloads: data.kpis.totalAndroidDownloads.value + data.kpis.totalIosDownloads.value,
       totalAppOpens: data.kpis.totalAppOpens.value,
-      totalAppEvents: data.appStats.reduce((a, b) => a + b.androidEvents + b.iosEvents, 0),
+      totalAppEvents: data.appStats.reduce((a: number, b: AppStatsDaily) => a + b.androidEvents + b.iosEvents, 0),
       totalSocialReach: data.kpis.totalSocialReach.value,
     };
 
