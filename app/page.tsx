@@ -1,8 +1,6 @@
 "use client";
 
-// ─── Main Dashboard Page ─────────────────────────────────────────────────────
-// Public analytics page showing app stats, downloads, and social media metrics.
-// Uses SWR for data fetching with automatic revalidation every 24 hours.
+
 
 import { useState, useEffect } from "react";
 import useSWR from "swr";
@@ -17,13 +15,13 @@ import { SocialChart } from "@/components/SocialChart";
 import { SummaryStats } from "@/components/SummaryStats";
 import { CSVExport } from "@/components/CSVExport";
 
-// ─── SWR Fetcher ─────────────────────────────────────────────────────────────
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// Auto-refresh every 24 hours (in ms)
+
 const REFRESH_INTERVAL = 24 * 60 * 60 * 1000;
 
-// ─── Loading Skeleton ────────────────────────────────────────────────────────
+
 function LoadingSkeleton() {
   return (
     <div className="space-y-8 animate-pulse">
@@ -59,7 +57,7 @@ function LoadingSkeleton() {
   );
 }
 
-// ─── KPI Gradient Configs ────────────────────────────────────────────────────
+
 const KPI_GRADIENTS = {
   android: { from: "#10b981", to: "#059669", id: "sparkAndroid" },
   ios: { from: "#6366f1", to: "#4f46e5", id: "sparkIos" },
@@ -67,7 +65,7 @@ const KPI_GRADIENTS = {
   social: { from: "#f43f5e", to: "#e11d48", id: "sparkSocial" },
 };
 
-// ─── Page Component ──────────────────────────────────────────────────────────
+
 export default function Home() {
   const [range, setRange] = useState<DateRangeKey>("30d");
   const [mounted, setMounted] = useState(false);
@@ -84,14 +82,14 @@ export default function Home() {
     }
   );
 
-  // Prevent hydration mismatch
+
   if (!mounted) return null;
 
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
-        {/* ── ERROR STATE ── */}
+
         {error && (
           <div className="mb-8 rounded-2xl border border-red-300 bg-red-50 p-6 
                         dark:border-red-500/20 dark:bg-red-500/10">
@@ -101,14 +99,14 @@ export default function Home() {
           </div>
         )}
 
-        {/* ── LOADING STATE ── */}
+
         {isLoading && <LoadingSkeleton />}
 
-        {/* ── LOADED STATE ── */}
+
         {data && !isLoading && (
           <div className="space-y-8">
 
-            {/* SECTION 1 — Header */}
+
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex-1">
                 <Header
@@ -122,7 +120,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* SECTION 2 — KPI Cards */}
+
             <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <KPICard
                 metric={data.kpis.totalAndroidDownloads}
@@ -150,16 +148,16 @@ export default function Home() {
               />
             </section>
 
-            {/* SECTION 3 — App Activity */}
+
             <AppStatsChart data={data.appStats} />
 
-            {/* SECTION 4 — App Downloads */}
+
             <DownloadsChart data={data.downloads} />
 
-            {/* SECTION 5 — Social Media Performance */}
+
             <SocialChart data={data.social} />
 
-            {/* SECTION 6 — Summary Stats */}
+
             <SummaryStats
               totalDownloads={data.summary.totalDownloads}
               totalAppOpens={data.summary.totalAppOpens}
@@ -167,7 +165,7 @@ export default function Home() {
               totalSocialReach={data.summary.totalSocialReach}
             />
 
-            {/* Footer */}
+
             <footer className="border-t pt-6 pb-8 text-center 
                             border-slate-200 dark:border-white/5">
               <p className="text-sm text-slate-500 dark:text-slate-500">

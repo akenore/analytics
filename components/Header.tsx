@@ -1,7 +1,5 @@
 "use client";
 
-// ─── Header Component ────────────────────────────────────────────────────────
-// Project name, last-updated timestamp, date range selector, and dark mode toggle.
 
 import { Calendar, RefreshCw } from "lucide-react";
 import { DarkModeToggle } from "./DarkModeToggle";

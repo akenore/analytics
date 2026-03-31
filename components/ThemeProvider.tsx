@@ -1,7 +1,5 @@
 "use client";
 
-// ─── Theme Provider ──────────────────────────────────────────────────────────
-// Manages dark/light mode state using a class on <html> element.
 
 import {
   createContext,
@@ -32,7 +30,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // Check localStorage or system preference on mount
     const stored = localStorage.getItem("theme") as Theme | null;
     if (stored) {
       setTheme(stored);
@@ -54,7 +51,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
-  // Prevent flash of wrong theme
+
   if (!mounted) {
     return <div style={{ visibility: "hidden" }}>{children}</div>;
   }

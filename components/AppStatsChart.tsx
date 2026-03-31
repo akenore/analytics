@@ -1,7 +1,5 @@
 "use client";
 
-// ─── App Stats Chart ─────────────────────────────────────────────────────────
-// Line chart showing app views, opens, and events for iOS and Android.
 
 import {
   ResponsiveContainer,

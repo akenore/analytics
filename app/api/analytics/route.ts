@@ -1,6 +1,5 @@
-
 import { NextRequest, NextResponse } from "next/server";
-import { generateMockDashboard } from "@/lib/mock-data";
+import { generateBaseDashboard } from "@/lib/mock-data";
 import type { DateRangeKey } from "@/lib/types";
 
 import { fetchAppStoreDownloads } from "@/lib/services/appstore-connect";
@@ -24,7 +23,7 @@ export async function GET(request: NextRequest) {
     const range = (searchParams.get("range") || "30d") as DateRangeKey;
     const days = RANGE_DAYS[range] || 30;
 
-    const data = generateMockDashboard(days);
+    const data = generateBaseDashboard(days);
 
     const [appStoreData, playData, metaData, instaData, tiktokData] = await Promise.all([
       fetchAppStoreDownloads(days),
@@ -36,58 +35,92 @@ export async function GET(request: NextRequest) {
 
     if (metaData) {
       metaData.forEach((realDay) => {
-        const mockDay = data.social.find((s) => s.date === realDay.date);
-        if (mockDay) {
-          if (realDay.facebookImpressions !== undefined) mockDay.facebookImpressions = realDay.facebookImpressions;
-          if (realDay.facebookReach !== undefined) mockDay.facebookReach = realDay.facebookReach;
-          if (realDay.facebookEngagement !== undefined) mockDay.facebookEngagement = realDay.facebookEngagement;
+        const day = data.social.find((s) => s.date === realDay.date);
+        if (day) {
+          if (realDay.facebookImpressions !== undefined) day.facebookImpressions = realDay.facebookImpressions;
+          if (realDay.facebookReach !== undefined) day.facebookReach = realDay.facebookReach;
+          if (realDay.facebookEngagement !== undefined) day.facebookEngagement = realDay.facebookEngagement;
         }
       });
     }
 
     if (instaData) {
       instaData.forEach((realDay) => {
-        const mockDay = data.social.find((s) => s.date === realDay.date);
-        if (mockDay) {
-          if (realDay.instagramImpressions !== undefined) mockDay.instagramImpressions = realDay.instagramImpressions;
-          if (realDay.instagramReach !== undefined) mockDay.instagramReach = realDay.instagramReach;
-          if (realDay.instagramEngagement !== undefined) mockDay.instagramEngagement = realDay.instagramEngagement;
+        const day = data.social.find((s) => s.date === realDay.date);
+        if (day) {
+          if (realDay.instagramImpressions !== undefined) day.instagramImpressions = realDay.instagramImpressions;
+          if (realDay.instagramReach !== undefined) day.instagramReach = realDay.instagramReach;
+          if (realDay.instagramEngagement !== undefined) day.instagramEngagement = realDay.instagramEngagement;
         }
       });
     }
 
     if (tiktokData) {
       tiktokData.forEach((realDay) => {
-        const mockDay = data.social.find((s) => s.date === realDay.date);
-        if (mockDay) {
-          if (realDay.tiktokViews !== undefined) mockDay.tiktokViews = realDay.tiktokViews;
-          if (realDay.tiktokLikes !== undefined) mockDay.tiktokLikes = realDay.tiktokLikes;
-          if (realDay.tiktokShares !== undefined) mockDay.tiktokShares = realDay.tiktokShares;
+        const day = data.social.find((s) => s.date === realDay.date);
+        if (day) {
+          if (realDay.tiktokViews !== undefined) day.tiktokViews = realDay.tiktokViews;
+          if (realDay.tiktokLikes !== undefined) day.tiktokLikes = realDay.tiktokLikes;
+          if (realDay.tiktokShares !== undefined) day.tiktokShares = realDay.tiktokShares;
         }
       });
     }
 
     if (appStoreData) {
       appStoreData.forEach((realDay) => {
-        const mockDay = data.downloads.find((d) => d.date === realDay.date);
-        if (mockDay && realDay.iosDownloads !== undefined) mockDay.iosDownloads = realDay.iosDownloads;
+        const day = data.downloads.find((d) => d.date === realDay.date);
+        if (day && realDay.iosDownloads !== undefined) day.iosDownloads = realDay.iosDownloads;
       });
     }
 
     if (playData) {
       playData.forEach((realDay) => {
-        const mockDay = data.downloads.find((d) => d.date === realDay.date);
-        if (mockDay && realDay.androidDownloads !== undefined) mockDay.androidDownloads = realDay.androidDownloads;
+        const day = data.downloads.find((d) => d.date === realDay.date);
+        if (day && realDay.androidDownloads !== undefined) day.androidDownloads = realDay.androidDownloads;
       });
     }
 
-    if (metaData || instaData || tiktokData) {
-      data.summary.totalSocialReach = data.social.reduce(
-        (sum, day) => sum + day.facebookReach + day.instagramReach + day.tiktokViews,
-        0
-      );
-      data.kpis.totalSocialReach.value = data.summary.totalSocialReach;
-    }
+    // Recalculate all KPIs and summaries from actual merged data
+    const androidDl = data.downloads.map((d) => d.androidDownloads);
+    const iosDl = data.downloads.map((d) => d.iosDownloads);
+    const appOpens = data.appStats.map((d) => d.androidOpens + d.iosOpens);
+    const socialReach = data.social.map((d) => d.facebookReach + d.instagramReach + d.tiktokViews);
+
+    data.kpis.totalAndroidDownloads = {
+      label: "Android Downloads",
+      value: androidDl.reduce((a, b) => a + b, 0),
+      previousValue: 0,
+      growthPercent: 0,
+      sparklineData: androidDl.slice(-14),
+    };
+    data.kpis.totalIosDownloads = {
+      label: "iOS Downloads",
+      value: iosDl.reduce((a, b) => a + b, 0),
+      previousValue: 0,
+      growthPercent: 0,
+      sparklineData: iosDl.slice(-14),
+    };
+    data.kpis.totalAppOpens = {
+      label: "App Opens",
+      value: appOpens.reduce((a, b) => a + b, 0),
+      previousValue: 0,
+      growthPercent: 0,
+      sparklineData: appOpens.slice(-14),
+    };
+    data.kpis.totalSocialReach = {
+      label: "Social Reach",
+      value: socialReach.reduce((a, b) => a + b, 0),
+      previousValue: 0,
+      growthPercent: 0,
+      sparklineData: socialReach.slice(-14),
+    };
+
+    data.summary = {
+      totalDownloads: data.kpis.totalAndroidDownloads.value + data.kpis.totalIosDownloads.value,
+      totalAppOpens: data.kpis.totalAppOpens.value,
+      totalAppEvents: data.appStats.reduce((a, b) => a + b.androidEvents + b.iosEvents, 0),
+      totalSocialReach: data.kpis.totalSocialReach.value,
+    };
 
     return NextResponse.json(data, {
       headers: {

@@ -1,7 +1,5 @@
 "use client";
 
-// ─── Social Media Performance Chart ──────────────────────────────────────────
-// Area chart showing reach across Facebook, Instagram, and TikTok.
 
 import {
   ResponsiveContainer,

@@ -1,7 +1,5 @@
 "use client";
 
-// ─── Summary Stats Section ───────────────────────────────────────────────────
-// Row of total aggregated stats: downloads, app opens, app events, social reach.
 
 import { Download, Smartphone, Zap, Radio } from "lucide-react";
 

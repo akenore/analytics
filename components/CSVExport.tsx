@@ -1,7 +1,5 @@
 "use client";
 
-// ─── CSV Export Button ───────────────────────────────────────────────────────
-// Downloads all current dashboard data as a CSV file.
 
 import { FileDown } from "lucide-react";
 import type { DashboardData } from "@/lib/types";

@@ -1,7 +1,5 @@
 "use client";
 
-// ─── App Downloads Chart ─────────────────────────────────────────────────────
-// Bar chart showing Android + iOS daily installs side by side.
 
 import {
   ResponsiveContainer,

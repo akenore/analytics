@@ -1,7 +1,5 @@
 "use client";
 
-// ─── KPI Card Component ──────────────────────────────────────────────────────
-// Large metric card with number, growth %, and sparkline mini-chart.
 
 import {
   ResponsiveContainer,

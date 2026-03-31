@@ -1,6 +1,5 @@
 "use client";
 
-// ─── Dark Mode Toggle ────────────────────────────────────────────────────────
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "./ThemeProvider";

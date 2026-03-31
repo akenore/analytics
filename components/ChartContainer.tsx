@@ -1,7 +1,5 @@
 "use client";
 
-// ─── Chart Container ─────────────────────────────────────────────────────────
-// Shared card wrapper for all chart sections.
 
 import type { ReactNode } from "react";
 

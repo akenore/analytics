@@ -1,8 +1,8 @@
 // ─── Analytics Data Types ────────────────────────────────────────────────────
 
-/** Daily app usage stats (views, opens, events) for iOS and Android */
+
 export interface AppStatsDaily {
-  date: string; // YYYY-MM-DD
+  date: string;
   androidViews: number;
   androidOpens: number;
   androidEvents: number;
@@ -11,31 +11,31 @@ export interface AppStatsDaily {
   iosEvents: number;
 }
 
-/** Daily app download metrics */
+
 export interface DownloadsDaily {
   date: string;
   androidDownloads: number;
   iosDownloads: number;
 }
 
-/** Daily social media performance — per platform */
+
 export interface SocialDaily {
   date: string;
-  // Facebook
+
   facebookImpressions: number;
   facebookReach: number;
   facebookEngagement: number;
-  // Instagram
+
   instagramImpressions: number;
   instagramReach: number;
   instagramEngagement: number;
-  // TikTok
+
   tiktokViews: number;
   tiktokLikes: number;
   tiktokShares: number;
 }
 
-/** A single KPI metric for the summary cards */
+
 export interface KPIMetric {
   label: string;
   value: number;
@@ -44,16 +44,16 @@ export interface KPIMetric {
   sparklineData: number[];
 }
 
-/** Date range options for the dashboard */
+
 export type DateRangeKey = "7d" | "30d" | "90d" | "all";
 
 export interface DateRangeOption {
   key: DateRangeKey;
   label: string;
-  days: number | null; // null = all time
+  days: number | null;
 }
 
-/** Aggregated dashboard response from API */
+
 export interface DashboardData {
   appStats: AppStatsDaily[];
   downloads: DownloadsDaily[];
