@@ -13,7 +13,7 @@ import {
 import { Activity } from "lucide-react";
 import type { AppStatsDaily } from "@/lib/types";
 import { ChartContainer } from "./ChartContainer";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "next-themes";
 
 interface AppStatsChartProps {
   data: AppStatsDaily[];
@@ -29,7 +29,7 @@ function formatLabel(label: unknown): string {
 }
 
 export function AppStatsChart({ data }: AppStatsChartProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
 
   const chartData = data.map((d) => ({
     date: d.date,

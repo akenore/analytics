@@ -13,7 +13,7 @@ import {
 import { Download } from "lucide-react";
 import type { DownloadsDaily } from "@/lib/types";
 import { ChartContainer } from "./ChartContainer";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "next-themes";
 
 interface DownloadsChartProps {
   data: DownloadsDaily[];
@@ -29,7 +29,7 @@ function formatLabel(label: unknown): string {
 }
 
 export function DownloadsChart({ data }: DownloadsChartProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
 
   const displayData = data.length > 60
     ? data.filter((_, i) => i % Math.ceil(data.length / 60) === 0)

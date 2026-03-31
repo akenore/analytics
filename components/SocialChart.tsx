@@ -13,7 +13,7 @@ import {
 import { Share2 } from "lucide-react";
 import type { SocialDaily } from "@/lib/types";
 import { ChartContainer } from "./ChartContainer";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "next-themes";
 
 interface SocialChartProps {
   data: SocialDaily[];
@@ -29,7 +29,7 @@ function formatLabel(label: unknown): string {
 }
 
 export function SocialChart({ data }: SocialChartProps) {
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
 
   const chartData = data.map((d) => ({
     date: d.date,
