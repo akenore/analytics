@@ -20,15 +20,21 @@ function parseCredentials() {
 async function downloadCSV(storage: Storage, filePath: string): Promise<string | null> {
   try {
     const [content] = await storage.bucket(BUCKET_NAME).file(filePath).download();
-    return content.toString("utf-8");
-  } catch {
+    // Google Play CSVs are encoded in UTF-16 (often UTF-16LE or UTF-16BE)
+    // The easiest and safest way to handle this for ASCII CSVs is to toString('utf-8') and strip null bytes
+    let text = content.toString("utf-8");
+    text = text.replace(/\0/g, "").replace(/^\ufeff/, "").replace(/^\xef\xbb\xbf/, "");
+    return text;
+  } catch (err: any) {
+    console.log(`[Google Play] Download failed for ${filePath}: ${err.code || err.message}`);
     return null;
   }
 }
 
-function parseInstallsCSV(csv: string, since: Date, until: Date): Map<string, number> {
+function parseInstallsCSV(csv: string, sinceStr: string, untilStr: string): Map<string, number> {
   const dailyMap = new Map<string, number>();
-  const lines = csv.split("\n");
+  const clean = csv.replace(/^\ufeff/, "");
+  const lines = clean.split("\n");
 
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -37,16 +43,12 @@ function parseInstallsCSV(csv: string, since: Date, until: Date): Map<string, nu
     const cols = line.split(",");
     if (cols.length < 3) continue;
 
-    const dateStr = cols[0];
-    const installs = parseInt(cols[7] || cols[2] || "0", 10);
+    const dateStr = cols[0].trim();
+    const installs = parseInt(cols[2] || "0", 10);
 
-    try {
-      const rowDate = parse(dateStr, "yyyy-MM-dd", new Date());
-      if (isAfter(rowDate, since) && isBefore(rowDate, until)) {
-        dailyMap.set(dateStr, (dailyMap.get(dateStr) || 0) + installs);
-      }
-    } catch {
-      continue;
+    // Simple string comparison for YYYY-MM-DD format
+    if (dateStr >= sinceStr && dateStr <= untilStr) {
+      dailyMap.set(dateStr, (dailyMap.get(dateStr) || 0) + installs);
     }
   }
 
@@ -75,6 +77,8 @@ export async function fetchGooglePlayDownloads(
       cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
     }
 
+    console.log(`[Google Play] Looking for months: ${[...months].join(', ')} for package: ${PACKAGE_NAME}`);
+
     const allInstalls = new Map<string, number>();
 
     for (const month of months) {
@@ -82,10 +86,14 @@ export async function fetchGooglePlayDownloads(
       const csv = await downloadCSV(storage, filePath);
 
       if (csv) {
-        const monthData = parseInstallsCSV(csv, since, until);
+        console.log(`[Google Play] Downloaded ${filePath} (${csv.length} bytes)`);
+        const monthData = parseInstallsCSV(csv, format(since, "yyyy-MM-dd"), format(until, "yyyy-MM-dd"));
+        console.log(`[Google Play] Parsed ${monthData.size} days from ${month}`);
         for (const [date, count] of monthData) {
           allInstalls.set(date, (allInstalls.get(date) || 0) + count);
         }
+      } else {
+        console.log(`[Google Play] No file: ${filePath}`);
       }
     }
 
